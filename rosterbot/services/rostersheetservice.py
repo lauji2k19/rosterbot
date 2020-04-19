@@ -222,7 +222,7 @@ class RosterSheetService:
     def set_unit_steamid(self, division, digits, steam_id):
         unit = self.find_in_roster(division, digits)
         if (unit != None):
-            range_string = f"B{unit.row_number}"
+            range_string = f"{division}!B{unit.row_number}"
             body = GeneralHelpers.generate_request_body(steam_id)
             response = self.sheet.values().update(spreadsheetId=ROSTER_SPREADSHEET_ID, range=range_string, valueInputOption="USER_ENTERED", body=body).execute()
             return f"{unit.name}'s SteamID is now {steam_id}."
@@ -231,7 +231,7 @@ class RosterSheetService:
     def set_tasking_points(self, division, digits, points):
         unit = self.find_in_roster(division, digits)
         if (unit != None):
-            range_string = f"F{unit.row_number}"
+            range_string = f"{division}!F{unit.row_number}"
             body = GeneralHelpers.generate_request_body(points)
             response = self.sheet.values().update(spreadsheetId=ROSTER_SPREADSHEET_ID, range=range_string, valueInputOption="USER_ENTERED", body=body).execute()
             return f"{unit.name} now has {points} point(s)."
