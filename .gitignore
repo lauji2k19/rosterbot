@@ -130,4 +130,4 @@ dmypy.json
 
 credentials.json
 sheettoken.pickle
-constants.py
+rosterbot/constants.py
