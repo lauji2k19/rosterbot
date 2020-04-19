@@ -213,7 +213,7 @@ class RosterSheetService:
             elif str(user_id) == unit.user_id:
                 desired_unit = unit
         if (desired_unit != None):
-            range_string = f"A{desired_unit.row_number}"
+            range_string = f"{division}!A{desired_unit.row_number}"
             body = GeneralHelpers.generate_request_body(new_name)
             response = self.sheet.values().update(spreadsheetId=ROSTER_SPREADSHEET_ID, range=range_string, valueInputOption="USER_ENTERED", body=body).execute()
             return f"{unit.name}'s new name is now {new_name}."

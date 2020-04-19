@@ -22,11 +22,11 @@ async def determine_prefix(bot, message):
     if guild:
         prefix = settings.get_server_settings(guild.id)["bot_prefix"]
         if prefix != None:
-            return prefix
+            return commands.when_mentioned_or(prefix)(bot, message)
         else:
-            return "_"
+            return commands.when_mentioned_or("_")(bot, message)
     else:
-        return "_"
+        return commands.when_mentioned_or("_")(bot, message)
 
 bot = commands.Bot(
     command_prefix = determine_prefix,

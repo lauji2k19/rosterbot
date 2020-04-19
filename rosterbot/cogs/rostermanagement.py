@@ -191,7 +191,7 @@ class RosterManagement(commands.Cog, name='Roster Management'):
             unit = singleunit.SingleUnit(after.display_name, None, after.id)
             push_result = roster_sheet.push_to_roster(local_settings["division_name"], unit)
             if 'FAILED' in push_result.upper():
-                await self.bot.get_channel(BOT_COMMAND_CHANNEL_ID).send(f"<@{after.id}>\n" + push_result)
+                await self.bot.get_channel(local_settings["bot_command_channel_id"]).send(f"<@{after.id}>\n" + push_result)
             roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
         
         if GeneralHelpers.has_lost_role(before, after, enlisted_role):
@@ -199,9 +199,9 @@ class RosterManagement(commands.Cog, name='Roster Management'):
             roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
         
         if GeneralHelpers.has_role(after, enlisted_role) and before.display_name != after.display_name:
-            push_result = roster_sheet.set_unit_name(before.display_name.split()[-1], after.display_name, after.id)
+            push_result = roster_sheet.set_unit_name(local_settings["division_name"], before.display_name.split()[-1], after.display_name, after.id)
             if 'FAILED' in push_result.upper() or 'COULD NOT BE FOUND' in push_result.upper():
-                await self.bot.get_channel(BOT_COMMAND_CHANNEL_ID).send(f"<@{after.id}>\n" + push_result)
+                await self.bot.get_channel(local_settings["bot_command_channel_id"]).send(f"<@{after.id}>\n" + push_result)
             roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
 
         if GeneralHelpers.has_role(after, enlisted_role):            
