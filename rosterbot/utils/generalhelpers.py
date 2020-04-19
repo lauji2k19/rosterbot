@@ -114,7 +114,7 @@ class GeneralHelpers:
         embed = discord.Embed(
             title = 'Roster - Updates Automatically',
             description = description,
-            color = 15961351
+            color = 0x04C0FC
         )
 
         embed.set_thumbnail(url='https://cdn.discordapp.com/icons/437778436333895680/204cb99c599888186f402fbcbf1ea575.webp?size=128')
@@ -129,6 +129,6 @@ class GeneralHelpers:
         if check_active == 'TRUE':
             for i in range(len(checked_unit_chunks)):
                 embed.add_field(name=f"Units with Activity Check Completed - {len(checked_units)} Units", value=GeneralHelpers.build_roster_string(checked_unit_chunks[i]), inline=False)
-        embed.add_field(name="Is the roster outdated?", value=f"You can refresh the roster with {bot_prefix}refreshroster.\nYou can set a unit's SteamID with: _setsteamid <DIGITS> <STEAMID>")
+        embed.add_field(name="Is the roster outdated?", value=f"You can refresh the roster with {bot_prefix}refreshroster.\nYou can set a unit's SteamID with: {bot_prefix}setsteamid <DIGITS> <STEAMID>")
         await channel.purge()
         await channel.send(embed=embed)

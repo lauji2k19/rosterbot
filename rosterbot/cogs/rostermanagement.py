@@ -3,7 +3,7 @@ import asyncio
 from discord.ext import commands
 from discord.utils import get
 from rosterbot.rosterbot import roster_sheet, logger, settings
-from rosterbot.constants import BOT_PREFIX, ROSTER_CHANNEL_ID, DEVELOPER_USER_ID, CO_COMMS_CHANNEL_ID, BOT_COMMAND_CHANNEL_ID, MASTER_GUILD_ID, MASTER_BOT_LOG_ID
+from rosterbot.constants import DEVELOPER_USER_ID, MASTER_GUILD_ID, MASTER_BOT_LOG_ID
 from rosterbot.models import singleunit
 from rosterbot.utils.generalhelpers import GeneralHelpers
 from rosterbot.utils.ranks import Rank
@@ -246,7 +246,7 @@ class RosterManagement(commands.Cog, name='Roster Management'):
             division_settings = settings.get_server_settings_by_division(division_name)
             roster_channel = self.bot.get_channel(division_settings['roster_channel_id'])
             roster = roster_sheet.read_roster(division_name)
-            await GeneralHelpers.display_roster(roster_channel, roster, roster_sheet.get_check_active(division_name), BOT_PREFIX)
+            await GeneralHelpers.display_roster(roster_channel, roster, roster_sheet.get_check_active(division_name), self.bot.command_prefix)
 
 def setup(bot):
     bot.add_cog(RosterManagement(bot))

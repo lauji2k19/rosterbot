@@ -7,7 +7,6 @@ from discord.ext import tasks, commands
 from rosterbot.services.rostersheetservice import RosterSheetService
 from rosterbot.services.mariasettingsservice import MariaSettingsService
 from rosterbot.utils.generalhelpers import GeneralHelpers
-from rosterbot.constants import BOT_PREFIX, ROSTER_CHANNEL_ID
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
