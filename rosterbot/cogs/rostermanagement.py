@@ -210,6 +210,7 @@ class RosterManagement(commands.Cog, name='Roster Management'):
         if GeneralHelpers.has_lost_role(before, after, enlisted_role):
             roster_sheet.remove_from_roster(local_settings["division_name"], after.id)
             roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
+            await self.bot.get_channel(local_settings["bot_log_channel_id"]).send(f"{after.display_name} has either left or been removed from the division.")
         
         if GeneralHelpers.has_role(after, enlisted_role) and before.display_name != after.display_name:
             push_result = roster_sheet.set_unit_name(local_settings["division_name"], before.display_name.split()[-1], after.display_name, after.id)
@@ -220,7 +221,6 @@ class RosterManagement(commands.Cog, name='Roster Management'):
         if GeneralHelpers.has_role(after, enlisted_role):            
             loa_role = get(before.guild.roles, name=local_settings["loa_role_name"])
             check_role = get(before.guild.roles, name=local_settings["check_role_name"])
-            tr_role = get(before.build.roles, name=local_settings["tr_role_name"])
 
             if GeneralHelpers.has_gotten_role(before, after, loa_role):
                 response = roster_sheet.manual_loa_status(local_settings["division_name"], after.id, True)

@@ -116,6 +116,8 @@ class SettingsManagement(commands.Cog, name='Settings Management'):
                 roster_sheet.push_to_roster(local_settings["division_name"], unit)
         roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
 
+        await ctx.channel.send(f"The database has been synced by <@{ctx.message.author.id}>.")
+
 
 def setup(bot):
     bot.add_cog(SettingsManagement(bot))
