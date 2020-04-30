@@ -15,10 +15,14 @@ class Rank(Enum):
     EPU = 9, 'EpU'
     SQL = 10, 'SqL'
     TOFC = 11, 'T-OfC'
-    OFCI = 12, 'OfC-I'
-    OFCII = 13, 'OfC-II'
-    OFCIII = 14, 'OfC-III'
-    CMD = 15, 'CmD'
+    TOFCALT = 12, 'T OfC'
+    OFCI = 13, 'OfC-I'
+    OFCIALT = 14, "OfC I"
+    OFCII = 15, 'OfC-II'
+    OFCIIALT = 16, "OfC II"
+    OFCIII = 17, 'OfC-III'
+    OFCIIIALT = 18, "OfC III"
+    CMD = 19, 'CmD'
 
     def __str__(self):
         return self.string
@@ -35,6 +39,13 @@ class Rank(Enum):
             if member.string == value:
                 return True
         return False
+    
+    @classmethod
+    def get_rank(cls, name):
+        for member in cls:
+            if member.string in name:
+                return member
+        return Rank.NINE
     
     @staticmethod
     def promote_unit(current_rank):

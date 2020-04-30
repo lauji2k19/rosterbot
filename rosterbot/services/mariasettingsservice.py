@@ -53,6 +53,9 @@ class MariaSettingsService:
     def set_co_role_name(self, server_id, role):
         self.query(f"UPDATE settings SET co_role_name='{role}' WHERE server_id={server_id}")
     
+    def set_roster_manager_role_name(self, server_id, role):
+        self.query(f"UPDATE settings SET roster_manager_role_name='{role}' WHERE server_id={server_id}")
+    
     def set_enlisted_role_name(self, server_id, role):
         self.query(f"UPDATE settings SET enlisted_role_name='{role}' WHERE server_id={server_id}")
 

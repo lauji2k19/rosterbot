@@ -14,13 +14,28 @@ class RosterManagement(commands.Cog, name='Roster Management'):
     def __init__(self, bot):
         self.bot = bot
 
-    async def has_privilege(self, ctx, role):
-        desired_role = get(ctx.guild.roles, name=role)
-        if desired_role in ctx.message.author.roles:
-            return True
-        else:
-            await ctx.channel.send(f"The {role} role is needed to run this command.")
-            return False
+    def is_co():
+        async def predicate(ctx):
+            local_settings = settings.get_server_settings(ctx.guild.id)
+            co_role = get(ctx.guild.roles, name=local_settings['co_role_name'])
+            if co_role in ctx.message.author.roles:
+                return True
+            else:
+                await ctx.channel.send(f"The {co_role} role is needed to run this command.")
+                return False
+        return commands.check(predicate)
+
+    def is_roster_manager():
+        async def predicate(ctx):
+            local_settings = settings.get_server_settings(ctx.guild.id)
+            manager_role = get(ctx.guild.roles, name=local_settings['roster_manager_role_name'])
+            co_role = get(ctx.guild.roles, name=local_settings['co_role_name'])
+            if manager_role in ctx.message.author.roles or co_role in ctx.message.author.roles:
+                return True
+            else:
+                await ctx.channel.send(f"You are not a roster manager.")
+                return False
+        return commands.check(predicate)
 
     @commands.command(help="Display the number of units currently in the division.")
     async def unitcount(self, ctx):
@@ -30,25 +45,23 @@ class RosterManagement(commands.Cog, name='Roster Management'):
         await channel.send(f"There are currently {len(roster)} units.") 
 
     @commands.command(help="Refresh the roster.")
+    @is_roster_manager()
     async def refreshroster(self, ctx):
         local_settings = settings.get_server_settings(ctx.guild.id)
-        valid_privilege = await self.has_privilege(ctx, local_settings['co_role_name'])
-        if valid_privilege:
-            channel = ctx.message.channel
-            if channel.id == local_settings['roster_channel_id']:
-                roster = roster_sheet.read_roster(local_settings["division_name"])
-                await GeneralHelpers.display_roster(channel, roster, roster_sheet.get_check_active(local_settings["division_name"]), local_settings['bot_prefix'])
-            else:
-                await channel.send(f"This command can only be run in <#{local_settings['roster_channel_id']}>.")
+        channel = ctx.message.channel
+        if channel.id == local_settings['roster_channel_id']:
+            roster = roster_sheet.read_roster(local_settings["division_name"])
+            await GeneralHelpers.display_roster(channel, roster, roster_sheet.get_check_active(local_settings["division_name"]), local_settings['bot_prefix'])
+        else:
+            await channel.send(f"This command can only be run in <#{local_settings['roster_channel_id']}>.")
 
     @commands.command(help="Set a unit's SteamID.")
+    @is_roster_manager()
     async def setsteamid(self, ctx, digits, steam_id):
         local_settings = settings.get_server_settings(ctx.guild.id)
-        valid_privilege = await self.has_privilege(ctx, local_settings['co_role_name'])
-        if valid_privilege:
-            response = roster_sheet.set_unit_steamid(local_settings["division_name"], digits, steam_id)
-            await ctx.channel.send(response)
-            roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
+        response = roster_sheet.set_unit_steamid(local_settings["division_name"], digits, steam_id)
+        await ctx.channel.send(response)
+        roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
 
     # @commands.command(help="Restore the roster to its latest backup (backups occur every 24 hours).")
     # @commands.has_permissions(manage_roles=True)
@@ -74,17 +87,17 @@ class RosterManagement(commands.Cog, name='Roster Management'):
     #     await self.bot.get_user(DEVELOPER_USER_ID).send(f"{ctx.message.author.display_name} ran {BOT_PREFIX}restoreroster")
 
     @commands.command(help="Sort the roster.")
+    @is_roster_manager()
     async def sortroster(self, ctx):
         local_settings = settings.get_server_settings(ctx.guild.id)
-        valid_privilege = await self.has_privilege(ctx, local_settings['co_role_name'])
-        if valid_privilege:
-            response = roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
-            await ctx.channel.send("The roster spreadsheet has been sorted.")
+        response = roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
+        await ctx.channel.send("The roster spreadsheet has been sorted.")
 
     @commands.command(help="Find a particular unit by digits.")
     async def find(self, ctx, digits):
+        local_settings = settings.get_server_settings(ctx.guild.id)
         channel = ctx.message.channel
-        unit = roster_sheet.find_in_roster(digits)
+        unit = roster_sheet.find_in_roster(local_settings["division_name"], digits)
         if unit != None:
             await channel.send(f'```Name: {unit.name}\n'
                                     f'SteamID: {unit.steam_id}\n'
@@ -117,24 +130,23 @@ class RosterManagement(commands.Cog, name='Roster Management'):
             await channel.send(f'```No units are on LOA.```')
 
     @commands.command(help="Start an activity check.")
+    @is_co()
     async def startcheck(self, ctx):
         local_settings = settings.get_server_settings(ctx.guild.id)
-        valid_privilege = await self.has_privilege(ctx, local_settings["co_role_name"])
-        if valid_privilege:
-            roster_sheet.set_check_active(local_settings["division_name"], True)
-            roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
-            await ctx.channel.send("You started an activity check.")
+        roster_sheet.set_check_active(local_settings["division_name"], True)
+        roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
+        await ctx.channel.send("You started an activity check.")
 
     @commands.command(help="Stop an activity check.")
+    @is_co()
     async def stopcheck(self, ctx):
         local_settings = settings.get_server_settings(ctx.guild.id)
-        valid_privilege = await self.has_privilege(ctx, local_settings["co_role_name"])
-        if valid_privilege:
-            roster_sheet.set_check_active(local_settings["division_name"], False)
-            roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
-            await ctx.channel.send("You stopped an activity check.")
+        roster_sheet.set_check_active(local_settings["division_name"], False)
+        roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
+        await ctx.channel.send("You stopped an activity check.")
 
     @commands.command(help="List all units who have not yet completed either an activity check or LOA request.")
+    @is_co()
     async def listincompletechecks(self, ctx):
         local_settings = settings.get_server_settings(ctx.guild.id)
         enlisted_role = get(ctx.guild.roles, name=local_settings['enlisted_role_name'])
@@ -193,6 +205,7 @@ class RosterManagement(commands.Cog, name='Roster Management'):
             if 'FAILED' in push_result.upper():
                 await self.bot.get_channel(local_settings["bot_command_channel_id"]).send(f"<@{after.id}>\n" + push_result)
             roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
+            await self.bot.get_channel(local_settings["bot_log_channel_id"]).send(f"{after.display_name} has joined the division.")
         
         if GeneralHelpers.has_lost_role(before, after, enlisted_role):
             roster_sheet.remove_from_roster(local_settings["division_name"], after.id)
@@ -207,6 +220,7 @@ class RosterManagement(commands.Cog, name='Roster Management'):
         if GeneralHelpers.has_role(after, enlisted_role):            
             loa_role = get(before.guild.roles, name=local_settings["loa_role_name"])
             check_role = get(before.guild.roles, name=local_settings["check_role_name"])
+            tr_role = get(before.build.roles, name=local_settings["tr_role_name"])
 
             if GeneralHelpers.has_gotten_role(before, after, loa_role):
                 response = roster_sheet.manual_loa_status(local_settings["division_name"], after.id, True)
