@@ -34,6 +34,7 @@ bot = commands.Bot(
     max_messages=10000)
 )
 
+
 cogs = [splitext(cog)[0] for cog in listdir("./rosterbot/cogs") if isfile(join("./rosterbot/cogs", cog))]
 for cog in cogs:
     if cog != "__init__":

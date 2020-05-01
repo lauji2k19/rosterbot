@@ -1,6 +1,8 @@
 import traceback
 from discord.ext import commands
-from rosterbot.rosterbot import logger
+from discord.utils import get
+from rosterbot.models import customerrors
+from rosterbot.rosterbot import logger, settings
 from rosterbot.constants import DEVELOPER_USER_ID
 
 class Errors(commands.Cog):
@@ -9,9 +11,18 @@ class Errors(commands.Cog):
     
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        await ctx.channel.send(error)
-        await self.bot.get_user(DEVELOPER_USER_ID).send(f"User {ctx.message.author.display_name} experienced error: ```{error}``` The traceback: ```{traceback.print_exception(type(error), error, error.__traceback__)}```")
-        await logger.log(error)
+        if isinstance(error, customerrors.NotCOError):
+            local_settings = settings.get_server_settings(ctx.guild.id)
+            co_role = get(ctx.guild.roles, name=local_settings['co_role_name'])
+            await ctx.channel.send(f"The {co_role} role is needed to run this command.")
+        elif isinstance(error, customerrors.NotRosterManagerError):
+            local_settings = settings.get_server_settings(ctx.guild.id)
+            roster_manager_role = get(ctx.guild.roles, name=local_settings['roster_manager_role_name'])
+            await ctx.channel.send(f"The {roster_manager_role} role is needed to run this command.")
+        else:
+            await ctx.channel.send(error)
+            await self.bot.get_user(DEVELOPER_USER_ID).send(f"User {ctx.message.author.display_name} experienced error: ```{error}``` The traceback: ```{traceback.print_exception(type(error), error, error.__traceback__)}```")
+            await logger.log(error)
 
     @commands.Cog.listener()
     async def on_error(self, event, *args, **kwargs):

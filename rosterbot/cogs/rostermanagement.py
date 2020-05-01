@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord.utils import get
 from rosterbot.rosterbot import roster_sheet, logger, settings
 from rosterbot.constants import DEVELOPER_USER_ID, MASTER_GUILD_ID, MASTER_BOT_LOG_ID
-from rosterbot.models import singleunit
+from rosterbot.models import singleunit, customerrors
 from rosterbot.utils.generalhelpers import GeneralHelpers
 from rosterbot.utils.ranks import Rank
 
@@ -21,8 +21,7 @@ class RosterManagement(commands.Cog, name='Roster Management'):
             if co_role in ctx.message.author.roles:
                 return True
             else:
-                await ctx.channel.send(f"The {co_role} role is needed to run this command.")
-                return False
+                raise customerrors.NotCOError
         return commands.check(predicate)
 
     def is_roster_manager():
@@ -33,8 +32,7 @@ class RosterManagement(commands.Cog, name='Roster Management'):
             if manager_role in ctx.message.author.roles or co_role in ctx.message.author.roles:
                 return True
             else:
-                await ctx.channel.send(f"You are not a roster manager.")
-                return False
+                raise customerrors.NotRosterManagerError
         return commands.check(predicate)
 
     @commands.command(help="Display the number of units currently in the division.")
