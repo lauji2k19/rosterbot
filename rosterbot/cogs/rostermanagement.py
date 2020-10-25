@@ -49,7 +49,7 @@ class RosterManagement(commands.Cog, name='Roster Management'):
         channel = ctx.message.channel
         if channel.id == local_settings['roster_channel_id']:
             roster = roster_sheet.read_roster(local_settings["division_name"])
-            await GeneralHelpers.display_roster(channel, roster, roster_sheet.get_check_active(local_settings["division_name"]), local_settings['bot_prefix'])
+            await GeneralHelpers.display_roster(self.bot, local_settings, channel, roster, roster_sheet.get_check_active(local_settings["division_name"]), local_settings['bot_prefix'])
         else:
             await channel.send(f"This command can only be run in <#{local_settings['roster_channel_id']}>.")
 
@@ -258,7 +258,7 @@ class RosterManagement(commands.Cog, name='Roster Management'):
             division_settings = settings.get_server_settings_by_division(division_name)
             roster_channel = self.bot.get_channel(division_settings['roster_channel_id'])
             roster = roster_sheet.read_roster(division_name)
-            await GeneralHelpers.display_roster(roster_channel, roster, roster_sheet.get_check_active(division_name), self.bot.command_prefix)
+            await GeneralHelpers.display_roster(self.bot, division_settings, roster_channel, roster, roster_sheet.get_check_active(division_name), self.bot.command_prefix)
 
 def setup(bot):
     bot.add_cog(RosterManagement(bot))
