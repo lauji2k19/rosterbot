@@ -27,6 +27,7 @@ class SettingsManagement(commands.Cog, name='Settings Management'):
         embed.add_field(name="command_prefix", value=f"{local_settings['bot_prefix']}", inline=False)
         embed.add_field(name="co_role_name", value=f"{local_settings['co_role_name']}", inline=False)
         embed.add_field(name="roster_manager_role_name", value=f"{local_settings['roster_manager_role_name']}", inline=False)
+        embed.add_field(name="nco_role_name", value=f"{local_settings['nco_role_name']}", inline=False)
         embed.add_field(name="enlisted_role_name", value=f"{local_settings['enlisted_role_name']}", inline=False)
         embed.add_field(name="loa_role_name", value=f"{local_settings['loa_role_name']}", inline=False)
         embed.add_field(name="check_role_name", value=f"{local_settings['check_role_name']}", inline=False)
@@ -78,6 +79,12 @@ class SettingsManagement(commands.Cog, name='Settings Management'):
     @commands.has_permissions(administrator=True)
     async def roster_manager_role_name(self, ctx, role):
         settings.set_roster_manager_role_name(ctx.guild.id, role)
+        await ctx.channel.send(f"Roster Manager Role Name set to: {role}")
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def nco_role_name(self, ctx, role):
+        settings.set_nco_role_name(ctx.guild.id, role)
         await ctx.channel.send(f"Roster Manager Role Name set to: {role}")
 
     @commands.command()
