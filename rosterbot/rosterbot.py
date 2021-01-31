@@ -28,10 +28,14 @@ async def determine_prefix(bot, message):
     else:
         return commands.when_mentioned_or("_")(bot, message)
 
+intents = discord.Intents.default()
+intents.members = True
+
 bot = commands.Bot(
     command_prefix = determine_prefix,
     activity=discord.Game(name=f"Beep",
-    max_messages=10000)
+    max_messages=10000),
+    intents=intents
 )
 
 

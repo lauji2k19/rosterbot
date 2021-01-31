@@ -1,5 +1,6 @@
 import discord
 from rosterbot.utils.ranks import Rank
+from discord.utils import get
 
 class GeneralHelpers:
     @staticmethod    
@@ -83,10 +84,17 @@ class GeneralHelpers:
         return [list[i * size:(i + 1) * size] for i in range((len(list) + size - 1) // size)]
 
     @staticmethod
-    async def display_roster(channel, roster, check_active, bot_prefix):
-        co_units = [unit for unit in roster if unit.rank.value >= Rank.TOFC.value and unit.loa.upper() == "FALSE"]
-        nco_units = [unit for unit in roster if unit.rank.value >= Rank.THREE.value and unit.rank.value < Rank.TOFC.value and unit.loa.upper() == "FALSE"]
-        enlisted_units = [unit for unit in roster if unit.rank.value < Rank.THREE.value and unit.loa.upper() == "FALSE"]
+    async def display_roster(bot, settings, channel, roster, check_active, bot_prefix):
+        current_guild = bot.get_guild(settings["server_id"])
+        enlisted_role = get(current_guild.roles, name=settings["enlisted_role_name"])
+        nco_role = get(current_guild.roles, name=settings["nco_role_name"])
+        co_role = get(current_guild.roles, name=settings["co_role_name"])
+
+        relevant_members = {str(member.id): member for member in current_guild.members if enlisted_role in member.roles}
+
+        co_units = [unit for unit in roster if co_role in relevant_members[unit.user_id].roles and unit.loa.upper() == "FALSE"]
+        nco_units = [unit for unit in roster if nco_role in relevant_members[unit.user_id].roles and co_role not in relevant_members[unit.user_id].roles and unit.loa.upper() == "FALSE"]
+        enlisted_units = [unit for unit in roster if enlisted_role in relevant_members[unit.user_id].roles and nco_role not in relevant_members[unit.user_id].roles and co_role not in relevant_members[unit.user_id].roles and unit.loa.upper() == "FALSE"]
         loa_units = [unit for unit in roster if unit.loa.upper() == "TRUE"]
         checked_units = [unit for unit in roster if unit.activity_check.upper() == "TRUE"]
 

@@ -49,7 +49,7 @@ class RosterManagement(commands.Cog, name='Roster Management'):
         channel = ctx.message.channel
         if channel.id == local_settings['roster_channel_id']:
             roster = roster_sheet.read_roster(local_settings["division_name"])
-            await GeneralHelpers.display_roster(channel, roster, roster_sheet.get_check_active(local_settings["division_name"]), local_settings['bot_prefix'])
+            await GeneralHelpers.display_roster(self.bot, local_settings, channel, roster, roster_sheet.get_check_active(local_settings["division_name"]), local_settings['bot_prefix'])
         else:
             await channel.send(f"This command can only be run in <#{local_settings['roster_channel_id']}>.")
 
@@ -196,6 +196,8 @@ class RosterManagement(commands.Cog, name='Roster Management'):
     async def on_member_update(self, before, after):
         local_settings = settings.get_server_settings(before.guild.id)
         enlisted_role = get(before.guild.roles, name=local_settings["enlisted_role_name"])
+        nco_role = get(before.guild.roles, name=local_settings["nco_role_name"])
+        co_role = get(before.guild.roles, name=local_settings["co_role_name"])
 
         if GeneralHelpers.has_gotten_role(before, after, enlisted_role):
             unit = singleunit.SingleUnit(after.display_name, None, after.id)
@@ -239,6 +241,12 @@ class RosterManagement(commands.Cog, name='Roster Management'):
                 response = roster_sheet.set_activity_check(local_settings["division_name"], after.id, False)
                 roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
 
+            if GeneralHelpers.has_gotten_role(before, after, nco_role) or GeneralHelpers.has_lost_role(before, after, nco_role):
+                roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
+
+            if GeneralHelpers.has_gotten_role(before, after, co_role) or GeneralHelpers.has_lost_role(before, after, co_role):
+                roster_sheet.sort_roster_spreadsheet(local_settings["division_name"])
+
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         local_settings = settings.get_server_settings(member.guild.id)
@@ -251,14 +259,14 @@ class RosterManagement(commands.Cog, name='Roster Management'):
             await self.bot.get_channel(CO_COMMS_CHANNEL_ID).send(f"{co_role.mention}\n{member.display_name} ({removed_unit.steam_id}) left the Discord with the MPF BALLISTA role.")
 
     @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.guild.id == MASTER_GUILD_ID and message.channel.id == MASTER_BOT_LOG_ID and message.author.bot and "ROSTER CHANGE" in message.content.upper():
+    async def on_message(self, message):        
+        if message.guild is not None and message.guild.id == MASTER_GUILD_ID and message.channel.id == MASTER_BOT_LOG_ID and message.author.bot and "ROSTER CHANGE" in message.content.upper():
             division_name = message.content.split(":")[0]
             await message.delete()
             division_settings = settings.get_server_settings_by_division(division_name)
             roster_channel = self.bot.get_channel(division_settings['roster_channel_id'])
             roster = roster_sheet.read_roster(division_name)
-            await GeneralHelpers.display_roster(roster_channel, roster, roster_sheet.get_check_active(division_name), self.bot.command_prefix)
+            await GeneralHelpers.display_roster(self.bot, division_settings, roster_channel, roster, roster_sheet.get_check_active(division_name), self.bot.command_prefix)
 
 def setup(bot):
     bot.add_cog(RosterManagement(bot))
