@@ -7,3 +7,7 @@ class NotCOError(commands.CommandError):
 class NotRosterManagerError(commands.CommandError):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+class EconomyNotEnabledError(commands.CommandError):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

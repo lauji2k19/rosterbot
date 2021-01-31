@@ -7,33 +7,13 @@ from rosterbot.constants import DEVELOPER_USER_ID, MASTER_GUILD_ID, MASTER_BOT_L
 from rosterbot.models import singleunit, customerrors
 from rosterbot.utils.generalhelpers import GeneralHelpers
 from rosterbot.utils.ranks import Rank
+from rosterbot.utils.predicates import is_co, is_roster_manager
 
 class RosterManagement(commands.Cog, name='Roster Management'):
     """Commands related to the roster."""
     
     def __init__(self, bot):
         self.bot = bot
-
-    def is_co():
-        async def predicate(ctx):
-            local_settings = settings.get_server_settings(ctx.guild.id)
-            co_role = get(ctx.guild.roles, name=local_settings['co_role_name'])
-            if co_role in ctx.message.author.roles:
-                return True
-            else:
-                raise customerrors.NotCOError
-        return commands.check(predicate)
-
-    def is_roster_manager():
-        async def predicate(ctx):
-            local_settings = settings.get_server_settings(ctx.guild.id)
-            manager_role = get(ctx.guild.roles, name=local_settings['roster_manager_role_name'])
-            co_role = get(ctx.guild.roles, name=local_settings['co_role_name'])
-            if manager_role in ctx.message.author.roles or co_role in ctx.message.author.roles:
-                return True
-            else:
-                raise customerrors.NotRosterManagerError
-        return commands.check(predicate)
 
     @commands.command(help="Display the number of units currently in the division.")
     async def unitcount(self, ctx):

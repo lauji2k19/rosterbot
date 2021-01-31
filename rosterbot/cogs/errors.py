@@ -26,6 +26,8 @@ class Errors(commands.Cog):
                 await ctx.channel.send(f"The {roster_manager_role} or {co_role} roles are needed to run this command.")
             else:
                 await ctx.channel.send("Either the roster_manager_role_name or co_role_name settings are invalid or not configured.")
+        elif isinstance(error, customerrors.EconomyNotEnabledError):
+            await ctx.channel.send("The economy system is not enabled for this server.")
         else:
             await ctx.channel.send(error)
             await self.bot.get_user(DEVELOPER_USER_ID).send(f"User {ctx.message.author.display_name} experienced error: ```{error}``` The traceback: ```{traceback.print_exception(type(error), error, error.__traceback__)}```")
