@@ -259,13 +259,7 @@ class RosterManagement(commands.Cog, name='Roster Management'):
             await self.bot.get_channel(CO_COMMS_CHANNEL_ID).send(f"{co_role.mention}\n{member.display_name} ({removed_unit.steam_id}) left the Discord with the MPF BALLISTA role.")
 
     @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.guild == None:
-            print("why guild null")
-
-        if message.channel == None:
-            print("Why channel null")
-        
+    async def on_message(self, message):        
         if message.guild is not None and message.guild.id == MASTER_GUILD_ID and message.channel.id == MASTER_BOT_LOG_ID and message.author.bot and "ROSTER CHANGE" in message.content.upper():
             division_name = message.content.split(":")[0]
             await message.delete()
