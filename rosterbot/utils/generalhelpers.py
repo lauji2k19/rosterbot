@@ -90,11 +90,11 @@ class GeneralHelpers:
         nco_role = get(current_guild.roles, name=settings["nco_role_name"])
         co_role = get(current_guild.roles, name=settings["co_role_name"])
 
-        relevant_members = {member.id: member for member in current_guild.members if enlisted_role in member.roles}
-        
+        relevant_members = {str(member.id): member for member in current_guild.members if enlisted_role in member.roles}
+
         co_units = [unit for unit in roster if co_role in relevant_members[unit.user_id].roles and unit.loa.upper() == "FALSE"]
         nco_units = [unit for unit in roster if nco_role in relevant_members[unit.user_id].roles and co_role not in relevant_members[unit.user_id].roles and unit.loa.upper() == "FALSE"]
-        enlisted_units = [unit for unit in roster if enlisted_role in relevant_members[unit.user_id].roles and not all(x in [nco_role, co_role] for x in relevant_members[unit.user_id].roles) and unit.loa.upper() == "FALSE"]
+        enlisted_units = [unit for unit in roster if enlisted_role in relevant_members[unit.user_id].roles and nco_role not in relevant_members[unit.user_id].roles and co_role not in relevant_members[unit.user_id].roles and unit.loa.upper() == "FALSE"]
         loa_units = [unit for unit in roster if unit.loa.upper() == "TRUE"]
         checked_units = [unit for unit in roster if unit.activity_check.upper() == "TRUE"]
 

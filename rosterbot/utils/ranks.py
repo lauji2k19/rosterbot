@@ -43,7 +43,7 @@ class Rank(Enum):
     @classmethod
     def get_rank(cls, name):
         for member in cls:
-            if member.string in name:
+            if member.string in name.split(" "):
                 return member
         return Rank.NINE
     
